@@ -1,3 +1,4 @@
 1: {'quantidade': 2} 
 3: {'quantidade': 2} 
 5: {'quantidade': 2} 
+3: {'produto_id': 5, 'quantidade': 8} 
