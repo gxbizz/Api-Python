@@ -6,8 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 
 origins = [
-    "http://localhost",
-    "http://localhost:3000"  # porta- front-end 
+    "http://127.0.0.1",
+    "http://127.0.0.1:5500"  # porta- front-end 
 ]
 
 app.add_middleware(

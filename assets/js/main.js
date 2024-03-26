@@ -1,23 +1,26 @@
-document.addEventListener("DOMContentLoaded", function() {
-    function getData(url) {
-        return fetch(url)
-            .then(response => response.json())
-            .catch(error => console.error('Erro na requisição GET:', error));
+async function getData(url) {
+    try {
+        const response = await fetch(url);
+        return await response.json();
+    } catch (error) {
+        return console.error('Erro na requisição GET:', error);
     }
+}
 
-    
+document.addEventListener("DOMContentLoaded", function() {  
     document.getElementById('linkProdutos').addEventListener('click', function(event) {
         event.preventDefault();
-        getData('http://localhost:8002/produtos')
+        let produtosHTML = '<h2>Produtos</h2>';
+        document.getElementById('conteudo').innerHTML = produtosHTML;
+        getData('http://127.0.0.1:8002/produtos')
             .then(data => {
-                
-                let produtosHTML = '<h2>Produtos</h2><ul>';
+                let productsList = "<ul>"
                 data.forEach(produto => {
-                    produtosHTML += `<li>${produto.nome} - ${produto.preco}</li>`;
+                   productsList += `<li>${produto.nome} - ${produto.preco}</li>`;
                 });
-                produtosHTML += '</ul>';
+               productsList += '</ul>';
                 // Exibir os produtos na div "conteudo"
-                document.getElementById('conteudo').innerHTML = produtosHTML;
+                document.getElementById('conteudo').innerHTML+=productsList;
             })
             .catch(error => console.error('Erro ao obter os produtos:', error));
     });
@@ -42,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const username = formData.get('username');
             const password = formData.get('password');
             
-            fetch('http://localhost:8001/login', {
+            fetch('http://127.0.0.1:8001/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -64,24 +67,21 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById('linkPedido').addEventListener('click', function(event) {
         event.preventDefault();
         // Exibir a lista de pedidos do usuário
-        getData('http://localhost:8004/pedidos/1') // Supondo que o ID do usuário seja 1
-            .then(data => {
-                // Montar o HTML com a lista de pedidos
-                let pedidosHTML = '<h2>Pedidos</h2><ul>';
-                data.forEach(pedido => {
-                    pedidosHTML += `<li>Order ID: ${pedido.order_id}, User ID: ${pedido.user_id}</li>`;
-                });
-                pedidosHTML += '</ul>';
-            
-                document.getElementById('conteudo').innerHTML = pedidosHTML;
-            })
-            .catch(error => console.error('Erro ao obter os pedidos:', error));
+        let pedidosHTML = 
+        `
+            <h2>Pedidos</h2>
+            <input placeholder="Digite o id do usuário" id="user-id">
+            <button onclick="consultarPedidos()">Consultar</button>
+
+            <ul id="pedidos-list"></ul>
+        `;
+        document.getElementById('conteudo').innerHTML = pedidosHTML;
     });
 
     document.getElementById('linkCarrinho').addEventListener('click', function(event) {
         event.preventDefault();
         // Exibir o carrinho do usuário
-        fetch('http://localhost:8003/carrinho/1') // Supondo que o ID do usuário seja 1
+        fetch('http://127.0.0.1:8003/carrinho/1') // Supondo que o ID do usuário seja 1
             .then(response => response.json())
             .then(data => {
                 // Montar o HTML com os itens do carrinho
@@ -96,3 +96,21 @@ document.addEventListener("DOMContentLoaded", function() {
             .catch(error => console.error('Erro ao obter o carrinho:', error));
     });
 });
+
+// Funções do sistema
+function consultarPedidos(){
+    getData('http://127.0.0.1:8004/pedidos/' + document.getElementById("user-id").value) // Supondo que o ID do usuário seja 432
+        .then(data => {
+            console.log(data)
+            let pedidosList = document.getElementById("pedidos-list");
+            pedidosList.innerHTML = ""
+
+            // Montar o HTML com a lista de pedidos
+            data.forEach(pedido => {
+                pedidosList.innerHTML += `<li>Order ID: ${pedido.order_id}, User ID: ${pedido.user_id}</li>`;
+            });
+            pedidosList.innerHTML += '</ul>';
+    
+        })
+        .catch(error => console.error('Erro ao obter os pedidos:', error));
+}
